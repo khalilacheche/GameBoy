@@ -4,6 +4,9 @@ import java.util.Objects;
 
 import gameboy.Preconditions;
 
+/**
+ * @author Khalil Haroun Achache
+ */
 public final class Bits {
 	private final static int [] reverses = new int[] {
 			  0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0,
@@ -44,24 +47,52 @@ public final class Bits {
 	}
 	
 	
+	/** Returns the 1 bit mask at the given index
+	 * @param index
+	 * @return
+	 * @throws IllegalArgumentException when the index is <0 or >= 32
+	 */
 	public static int mask(int index) {
 		return 1 << validIndex(index);
 	}
 	
+	/** Tests the boolean value at the given index of the given bits
+	 * @param bits
+	 * @param index
+	 * @return true when 1 , false when 0
+	 */
 	public static boolean test (int bits, int index) {
 		return (bits & mask(validIndex(index))) != 0;
 	}
+	/** Tests the boolean value at the given index of the given bits
+	 * @param bits
+	 * @param bit index
+	 * @return true when 1 , false when 0
+	 */
 	public static boolean test (int bits, Bit bit) {
 		return test(bits,validIndex(bit.ordinal()));
 	}
 	
 	
+	/** Sets the bit at the given index in the given bits to the newValue
+	 * @param bits
+	 * @param index
+	 * @param newValue
+	 * @return the new number
+	 * @throws IllegalArgumentException when the given index is not valid
+	 */
 	public static int set (int bits , int index, boolean newValue) {
 		validIndex(index);
 		int mask = 0xFFFFFFFF - (1<<index);
 		return (bits & mask)| ((newValue? 1:0)<<index);
 	}
 
+	/** returns the first "size" bits
+	 * @param size
+	 * @param bits
+	 * @return
+	 * @throws IllegalArgumentException when the given size is negative, or >32
+	 */
 	public static int clip(int size, int bits) {
 		Preconditions.checkArgument(size>=0 && size<=Integer.SIZE);
 		if (size == Integer.SIZE)
@@ -71,12 +102,25 @@ public final class Bits {
 		return bits & ((1<< size)-1);
 	}
 	
+	/**
+	 * @param bits
+	 * @param start
+	 * @param size
+	 * @return
+	 */
 	public static int extract(int bits, int start, int size) {
 		Objects.checkFromIndexSize(start, size, Integer.SIZE);
 		if( size == Integer.SIZE)
 			return bits;
 		return ((bits>>start) & ((1<<size)-1));
 	}
+	/** Rotates the "size" bits according to distance 
+	 * @param size : the span of rotation
+	 * @param bits : the bits to rotate
+	 * @param distance : the distance to which rotate, >0 for left, <0 for right
+	 * @return the rotated number
+	 * @throws IllegalArgumentException when size is too big, or the given bits are more than the size
+	 */
 	public static int rotate(int size, int bits, int distance) {
 		Preconditions.checkArgument(size>0 && size<=Integer.SIZE && (bits<Math.pow(2, size)));
 		
@@ -86,18 +130,36 @@ public final class Bits {
 			return (bits<<d | ((bits >> size-d)& (1<<d)-1)) ;
 		return  (masked<<d | masked >> size-d) & ((1<< size)-1);
 	}
+	/**
+	 * @param b
+	 * @return
+	 */
 	public static int signExtend8(int b) {
 		Preconditions.checkBits8(b);
 		byte temp1 = (byte)b;
 		return (int)temp1;
 	}
+	/**
+	 * @param b
+	 * @return
+	 */
 	public static int reverse8(int b) {
 		return reverses[Preconditions.checkBits8(b)];
 	}
+	/**
+	 * @param b
+	 * @return
+	 */
 	public static int complement8(int b) {
 		Preconditions.checkBits8(b);
 		return b^0xFF;
 	}
+	/** Concatenates two 8 bit numbers
+	 * @param highB : MS 8 bits
+	 * @param lowB : LS 8 bits
+	 * @return the concatenated number
+	 * @throws IllegalArgumentException if at least one of the parameters is not an 8-bit number 
+	 */
 	public static int make16(int highB, int lowB) {
 		
 		return Preconditions.checkBits8(highB)<<8 | Preconditions.checkBits8(lowB);
