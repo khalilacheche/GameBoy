@@ -83,7 +83,7 @@ public final class Bits {
 		int d = Math.floorMod(distance, size);
 		int masked = bits & ((1<< size)-1);
 		if (size == Integer.SIZE)
-			return (bits<<d | ((bits >> size-d)& (1<<d)-1) ) ;
+			return (bits<<d | ((bits >> size-d)& (1<<d)-1)) ;
 		return  (masked<<d | masked >> size-d) & ((1<< size)-1);
 	}
 	public static int signExtend8(int b) {
